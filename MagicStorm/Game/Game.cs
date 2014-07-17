@@ -21,7 +21,8 @@ namespace MagicStorm.Game
         {
             if (keyboard.GetActionTime(EKeyboardAction.Esc) == 1) return null;
 
-            Frame frame = new Frame();
+            Frame frame = new Frame(); 
+            
             _animRecorder.Process(keyboard, ref frame);
 
             _state.tiles[4].growingTime = 2;
@@ -86,7 +87,7 @@ namespace MagicStorm.Game
                     new Point2(w.team == Wizard.ETeam.first ? Config.PlayerInfoLeft : Config.PlayerInfoRight,
                     Config.PlayerInfoLine),
                 Config.LetterSize,
-                w.hp.ToString() + Change(w.hpChange),
+                "HP - "+w.hp.ToString() + Change(w.hpChange),
                 "огонь - " + w.flowers[0].ToString() + Change(w.flowersChange[0]),
                 "вода - " + w.flowers[1].ToString() + Change(w.flowersChange[1]),
                 "земля - " + w.flowers[2].ToString() + Change(w.flowersChange[2]),
@@ -94,7 +95,7 @@ namespace MagicStorm.Game
                 );
             }
 
-            frame.Add(new Text(EFont.orange,
+            frame.Add(new Text(EFont.lilac,
                 new Point2(Config.GameSize.x / 2 - Config.LetterSize.x, Config.TeamsAndTimeLine),
                 Config.LetterSize, _turn.ToString()));
 
@@ -106,10 +107,10 @@ namespace MagicStorm.Game
             frame.Add(new Sprite(ESprite.redStrip, new Vector2(Config.ScoreCorner + new Point2(separateScore, 0) + new Point2((Config.ScoreRectSize.x - separateScore) / 2, 0) + new Point2(0, Config.ScoreRectSize.y /2)),
                 new Point2(Config.ScoreRectSize.x - separateScore, Config.ScoreRectSize.y)));
 
-            double rightOffset =  Config.ScoreRectSize.x - (_state.wizards[1].name.Length + 2) * Config.LetterSize.x;
-            frame.Add(new Text(EFont.orange, Config.ScoreCorner + new Point2(Config.LetterSize.x * 2, (Config.ScoreRectSize.y - Config.LetterSize.y) / 2) ,
+            double rightOffset =  Config.ScoreRectSize.x - (_state.wizards[1].name.Length + 0) * Config.LetterSize.x;
+            frame.Add(new Text(EFont.lilac, new Point2(Config.ScoreCorner.x + Config.LetterSize.x, Config.TeamsAndTimeLine),
                 Config.LetterSize, _state.wizards[0].name));
-            frame.Add(new Text(EFont.orange, Config.ScoreCorner + new Point2(rightOffset, (Config.ScoreRectSize.y - Config.LetterSize.y) / 2),
+            frame.Add(new Text(EFont.lilac, new Point2(Config.ScoreCorner.x + rightOffset, Config.TeamsAndTimeLine),
                Config.LetterSize, _state.wizards[1].name));
             
             #endregion

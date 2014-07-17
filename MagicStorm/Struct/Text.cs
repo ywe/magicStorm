@@ -114,8 +114,8 @@ namespace MagicStorm
                 {
                     if (Config.FontLetters.Contains(lines[i][j]))
                     {
-                        Vector2 translation = new Vector2(0,0,-TextSize.x / 2 + j * letterWidth,
-                            -TextSize.y / 2 + i * letterHeight);
+                        Vector2 translation = new Vector2(0,0,-TextSize.x / 2 + j * letterWidth + letterWidth/2,
+                            -TextSize.y / 2 + i * letterHeight + letterHeight/2);
                         translation.Rotate(pos.angleDeg);
 
                         Sprite toAdd = new Sprite(ESprite.end, new Vector2(pos.x + translation.vx, pos.y + translation.vy, pos.angleDeg), letterWidth, letterHeight, Config.FontLetters.IndexOf(lines[i][j]));

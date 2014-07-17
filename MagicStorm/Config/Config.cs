@@ -77,12 +77,12 @@ namespace MagicStorm
         public static double MenuLine = 12.5;
         public static double IndLine = FloorLine - WizardSize.y * 1.5;
 
-        public static Point2 ScoreCorner = new Point2(25,5);
+        public static Point2 ScoreCorner = new Point2(25,3.5);
         public static Point2 LetterSize = new Point2(1, 2);
-        public static double PlayerInfoLine = 2.5;
+        public static double PlayerInfoLine = 1;
         public static double PlayerInfoLeft = 5;
-        public static double PlayerInfoRight = 88;
-        public static double TeamsAndTimeLine = PlayerInfoLine ;
+        public static double PlayerInfoRight = 84;
+        public static double TeamsAndTimeLine = 1 ;
         public static Point2 ScoreRectSize = new Point2(50, 3);
         //----------------------------------
 

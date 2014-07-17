@@ -1,0 +1,9 @@
+D:\docum\_PROJECTS\Space\Fire\Fire\bin\Debug\Fire.exe
+D:\docum\_PROJECTS\Space\Fire\Fire\bin\Debug\Fire.pdb
+D:\docum\_PROJECTS\Space\Fire\Fire\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\docum\_PROJECTS\Space\Fire\Fire\obj\x86\Debug\GenerateResource.read.1.tlog
+D:\docum\_PROJECTS\Space\Fire\Fire\obj\x86\Debug\GenerateResource.write.1.tlog
+D:\docum\_PROJECTS\Space\Fire\Fire\obj\x86\Debug\Fire.exe
+D:\docum\_PROJECTS\Space\Fire\Fire\obj\x86\Debug\Fire.pdb
+D:\docum\_PROJECTS\Space\Fire\Fire\obj\x86\Debug\Game2D.Form1.resources
+D:\docum\_PROJECTS\Space\Fire\Fire\obj\x86\Debug\Game2D.Properties.Resources.resources

@@ -61,5 +61,16 @@ namespace MagicStorm
             return new Point2(a.x - b.x, a.y - b.y);
         }
 
+        public static Point2 operator *(Point2 a, double b)
+        {
+            return new Point2(a.x * b, a.y * b);
+        }
+
+        public static Point2 operator /(Point2 a, double b)
+        {
+            if (b == 0) throw new Exception("деление на ноль");
+            return new Point2(a.x / b, a.y / b);
+        }
+
     }
 }

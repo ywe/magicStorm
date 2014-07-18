@@ -71,7 +71,18 @@ namespace MagicStorm
             this.letterHeight = letterSize.y;
             this.position = new Vector2( location.x, location.y, 0);
         }
-
+        /// <summary>
+        /// Горизонтальный текст. Задается центр, ширина и высота буквы 
+        /// </summary>
+        public Text(EFont font, bool center, Point2 location, Point2 letterSize, params string[] lines)
+        {
+            this.lines = new List<string>(lines);
+            this.font = font;
+            this.letterWidth = letterSize.x;
+            this.letterHeight = letterSize.y;
+            this.position = new Vector2(0, 0, 0);
+            this.position = new Vector2(location.x - TextSize.x/2, location.y - TextSize.y/2, 0);
+        }
         /// <summary>
         /// Горизонтальный текст. Задается верхний левый угол, ширина и высота буквы 
         /// </summary>

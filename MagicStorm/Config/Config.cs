@@ -9,6 +9,7 @@ namespace MagicStorm
     //вынесены для краткости кода
     //Доступные спрайты. end - чтобы можно было легко пробежать по всем
     public enum ESprite { menuback, blueStrip, redStrip, 
+        activePlayer, switcher, tileMarker,
         wizardBlue, wizardPink, arrowBlue, arrowRed, 
         boulder, energyBall, explosion, eyes,
         fire, fist, lightning, plus, 
@@ -19,10 +20,35 @@ namespace MagicStorm
     public enum EFont { orange, fiol, green, lilac, end }
     
     //действия, которые поддерживает клавиатура. Должны быть привязаны конкретные кнопки в конструкторе
-    public enum EKeyboardAction { Fire, Esc, Enter, end };
+    public enum EKeyboardAction { Fire, Esc, Enter, left, right, up, down, end };
 
+    //чтобы убрать из игры команду, достаточно перенести ее в конец и уменьшить command_count
+    public enum ECommand
+    { 
+        //neutral
+        move = 0,
+        fly = 1,
+        wall = 2,
+        heal = 3,
+        spy = 4,
+        changeColor = 5,
+        frigidity = 6,
+
+        //attack
+        fist = 7,
+        energyBall = 8,
+        explosion = 9,
+        boulder = 10,
+        poison = 11,
+        fire = 12,
+        lightning = 13,
+        wind = 14
+    }
     class Config
     {
+        public static int COMMAND_COUNT = 15;
+
+
         #region nested sprite config class
         public class SpriteConfig
         {
@@ -72,6 +98,7 @@ namespace MagicStorm
         public static double TileGap = 1.0/TileWidthToTileGapCoeff;
         //-----------------------------------------
 
+        public static Point2 WizardSize = new Point2(TileSize.x, TileSize.x * 2);
         //Locations and labels--------------------------------
         public static double FloorLine = FirstTilePos.y - TileSize.y/2;
         public static double MenuLine = 12.5;
@@ -79,16 +106,18 @@ namespace MagicStorm
 
         public static Point2 ScoreCorner = new Point2(25,3.5);
         public static Point2 LetterSize = new Point2(1, 2);
+        public static Point2 LetterSizeBig = new Point2(2.5, 4);
         public static double PlayerInfoLine = 1;
         public static double PlayerInfoLeft = 5;
         public static double PlayerInfoRight = 84;
         public static double TeamsAndTimeLine = 1 ;
         public static Point2 ScoreRectSize = new Point2(50, 3);
+
+        public static Vector2[] CommandCorner = new Vector2[] { new Vector2(33, 7.5, 8, 4), new Vector2(60, 7.5, 8, 4) }; 
         //----------------------------------
 
         //game sprite sizes--------------------------------------
         public static Point2 TileBorderSize = new Point2(TileSize.x, TileSize.y );
-        public static Point2 WizardSize = new Point2(TileSize.x, TileSize.x * 2);
         public static double WizardVert = WizardSize.y / 10;
         public static Point2 ArrowSize = new Point2(TileSize.x, TileSize.x);
         public static Point2 EyeSize = new Point2(TileSize.x, TileSize.x / 2);
@@ -104,6 +133,8 @@ namespace MagicStorm
         public static Point2 ExplosionSize = new Point2(TileSize.x, TileSize.x);
         public static Point2 WindArrowSize = new Point2(TileSize.x, TileSize.x);
         public static Point2 PlusSize = new Point2(TileSize.x, TileSize.x);
+        public static Point2 SwitcherSize = new Point2(2, 0.6);
+        public static Point2 MarkerSize = new Point2(1, 1);
         //----------------------------------------------------
 
 
@@ -116,6 +147,10 @@ namespace MagicStorm
             Keys.Add(EKeyboardAction.Fire, 32);
             Keys.Add(EKeyboardAction.Esc, 27);
             Keys.Add(EKeyboardAction.Enter, 13);
+            Keys.Add(EKeyboardAction.left, 37);
+            Keys.Add(EKeyboardAction.up, 38);
+            Keys.Add(EKeyboardAction.right, 39);
+            Keys.Add(EKeyboardAction.down, 40);
         }
 
         //потом подправить кадры элементарно, если анимация

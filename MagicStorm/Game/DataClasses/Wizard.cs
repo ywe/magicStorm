@@ -15,6 +15,10 @@ namespace MagicStorm.Game.DataClasses
         public int[] flowersChange = new int[4];
         public int pos;
         public string name;
+        public string programAddress = null;
+
+        public int lastCommand=-1;
+        public int lastTile;
         public Wizard(ETeam team)
         {
             for(int i = 0; i < flowers.Length;i++) flowers[i] = Config.StartRes;

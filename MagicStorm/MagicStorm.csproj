@@ -83,10 +83,15 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FormMain.cs" />
+    <Compile Include="FormMain.Designer.cs">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </Compile>
     <Compile Include="Game\Abstract\IProcess.cs" />
     <Compile Include="Game\Animator.cs" />
     <Compile Include="Game\Concrete\AnimRecorder.cs" />
     <Compile Include="Game\DataClasses\Moving.cs" />
+    <Compile Include="Game\DataClasses\ParamsFromFormToGame.cs" />
     <Compile Include="Game\DataClasses\State.cs" />
     <Compile Include="Game\DataClasses\Tile.cs" />
     <Compile Include="Game\DataClasses\Wizard.cs" />
@@ -112,6 +117,9 @@
     <Compile Include="Struct\Sprite.cs" />
     <Compile Include="Struct\Text.cs" />
     <Compile Include="Struct\Vector2.cs" />
+    <EmbeddedResource Include="FormMain.resx">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="OpenglFramework\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

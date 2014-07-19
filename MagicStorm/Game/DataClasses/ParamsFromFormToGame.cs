@@ -7,5 +7,9 @@ namespace MagicStorm.Game.DataClasses
 {
     public class ParamsFromFormToGame
     {
+        public string firstAddress = null;
+        public string secondAddress = null;//null - играет человек
+        public string logfile;
+        public int[] map;
     }
 }

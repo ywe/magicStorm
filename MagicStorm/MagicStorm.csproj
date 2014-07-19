@@ -83,7 +83,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FormMain.cs" />
+    <Compile Include="FormMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
@@ -145,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="OpenglFramework\HowItWorks.txt" />
+    <None Include="Resources\icon0.png" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

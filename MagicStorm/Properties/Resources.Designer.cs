@@ -59,5 +59,12 @@ namespace MagicStorm.Properties {
                 resourceCulture = value;
             }
         }
+        
+        internal static System.Drawing.Bitmap icon0 {
+            get {
+                object obj = ResourceManager.GetObject("icon0", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

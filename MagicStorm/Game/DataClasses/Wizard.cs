@@ -14,8 +14,10 @@ namespace MagicStorm.Game.DataClasses
         public int[] flowers = new int[4];
         public int[] flowersChange = new int[4];
         public int pos;
+
         public string name;
         public string programAddress = null;
+        public List<int> savedNumbers = new List<int>();
 
         public int lastCommand=-1;
         public int lastTile;

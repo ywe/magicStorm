@@ -48,6 +48,26 @@ namespace MagicStorm
     {
         public static int COMMAND_COUNT = 15;
 
+        public static Dictionary<ECommand, int[]> Cost = new Dictionary<ECommand, int[]>
+        {
+            //red blue green white
+            {ECommand.move , new int[]{0,0,0,0}},
+            {ECommand.fly , new int[]{0,0,0,4}},
+            {ECommand.wall , new int[]{0,7,0,0}},
+            {ECommand.heal , new int[]{0,0,10,0}},
+            {ECommand.spy , new int[]{1,1,1,1}},
+            {ECommand.changeColor , new int[]{3,3,3,3}},
+            {ECommand.frigidity , new int[]{0,9,0,0}},
+
+            {ECommand.fist , new int[]{0,0,0,0}},
+            {ECommand.energyBall , new int[]{2,2,2,2}},
+            {ECommand.explosion , new int[]{12,0,0,0}},
+            {ECommand.boulder , new int[]{0,0,20,0}},
+            {ECommand.poison , new int[]{0,0,0,14}},
+            {ECommand.fire , new int[]{31,0,0,0}},
+            {ECommand.lightning , new int[]{0,26,0,0}},
+            {ECommand.wind , new int[]{0,0,0,18}},
+        };
 
         #region nested sprite config class
         public class SpriteConfig
@@ -76,7 +96,8 @@ namespace MagicStorm
         public const double ScreenWidth = 100;
         public const double ScreenHeight = 75;
         public const int TimePerFrame = 20; //в миллисекундах
-        
+        public const double AnimSpeed = 1.0; //стандартное время умножается на это число
+
         #region game constants
         public static Point2 GameSize = new Point2(100, 35); //width better not to change
         public static int TileCount = 20;

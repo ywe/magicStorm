@@ -19,6 +19,10 @@ namespace MagicStorm.Game
 
         int _turn = 0;
 
+        public Game(ParamsFromFormToGame p)
+        {
+
+        }
 
         public Frame Process(IGetKeyboardState keyboard)
         {

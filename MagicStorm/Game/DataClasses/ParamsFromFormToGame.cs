@@ -11,5 +11,6 @@ namespace MagicStorm.Game.DataClasses
         public string secondAddress = null;//null - играет человек
         public string logfile;
         public int[] map;
+        public double animTime;
     }
 }

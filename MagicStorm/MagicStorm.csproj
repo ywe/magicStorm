@@ -97,6 +97,7 @@
     <Compile Include="Game\DataClasses\State.cs" />
     <Compile Include="Game\DataClasses\Tile.cs" />
     <Compile Include="Game\DataClasses\Wizard.cs" />
+    <Compile Include="Game\ExternalProgramExecuter.cs" />
     <Compile Include="Game\TurnMaker.cs" />
     <Compile Include="OpenglFramework\IGame.cs" />
     <Compile Include="OpenglFramework\IGetKeyboardState.cs" />

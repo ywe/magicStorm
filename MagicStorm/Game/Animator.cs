@@ -30,10 +30,10 @@ namespace MagicStorm.Game
             switch (command)
             {
                 case ECommand.spy:
-                    Moving m = new Moving(ESprite.eyes, Config.EyeSize, AboveTile(w.pos)+UP);
-                    m.AddMove(AboveTile(w.pos),t(50),Linear);
-                    m.AddMove(AboveTile(w.pos), t(10), Linear);
-                    m.AddMove(AboveTile(w.pos) + UP, t(50), Linear);
+                    Moving m = new Moving(ESprite.eyes, Config.EyeSize, AboveTile(enemy.pos) + UP);
+                    m.AddMove(AboveTile(enemy.pos), t(50), Linear);
+                    m.AddMove(AboveTile(enemy.pos), t(10), Linear);
+                    m.AddMove(AboveTile(enemy.pos) + UP, t(50), Linear);
                     move.Add(m);
                     break;
             }

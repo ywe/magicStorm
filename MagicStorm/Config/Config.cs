@@ -92,11 +92,13 @@ namespace MagicStorm
         //сопоставили действия клавиатуры с конкретными клавишами
         static public readonly Dictionary<EKeyboardAction, byte> Keys= new Dictionary<EKeyboardAction,byte>();
 
-        public static string WindowName = "2D Framework"; 
+        public static string WindowName = "Magic Storm"; 
         public const double ScreenWidth = 100;
         public const double ScreenHeight = 75;
         public const int TimePerFrame = 20; //в миллисекундах
-        public const double AnimSpeed = 1.0; //стандартное время умножается на это число
+        public static double AnimSpeed = 1.0; //стандартное время умножается на это число
+        public const int TimePerTurn = 2000; //милилсекунды, время выполнения программы
+        public const int MaxOutputNumbers = 5;
 
         #region game constants
         public static Point2 GameSize = new Point2(100, 35); //width better not to change

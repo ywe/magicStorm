@@ -5,6 +5,7 @@ using System.Text;
 using MagicStorm.Opengl;
 using MagicStorm.Game.Concrete;
 using MagicStorm.Game.DataClasses;
+using System.IO;
 
 namespace MagicStorm.Game
 {
@@ -21,7 +22,32 @@ namespace MagicStorm.Game
 
         public Game(ParamsFromFormToGame p)
         {
+            _state.wizards[0].programAddress = p.firstAddress;
+            _state.wizards[1].programAddress = p.secondAddress;
+            _state.tiles = new Tile[p.map.Length];
+            for(int i = 0; i < p.map.Length; i++)
+            {
+                _state.tiles[i] = new Tile(p.map[i]-1);
+            }
+            int center = p.map.Length / 2 - 1;
+            _state.wizards[0].pos = center;
+            _state.wizards[1].pos = center + 1;
+            _state.tiles[center].growingTime = _state.tiles[center + 1].growingTime = Config.FlowerGrowingTime;
+            Config.AnimSpeed = p.animTime;
 
+            for(int i = 0; i < 2; i++)
+            {
+                if (_state.wizards[i].programAddress == null)
+                    _state.wizards[i].name = "Человек";
+                else
+                {
+                    string file = Path.GetFileName(_state.wizards[i].programAddress);
+                    _state.wizards[i].name = file.Substring(0, file.Length - 4);
+                }
+            }
+            
+
+            _turnMaker.logfile = p.logfile;
         }
 
         public Frame Process(IGetKeyboardState keyboard)
@@ -37,8 +63,10 @@ namespace MagicStorm.Game
 
             Frame turnFrame = new Frame();
             #region turn control part
-            int command, tile;
-            _turnMaker.Process(_state.wizards[_state.activeWizard], ref turnFrame, keyboard, out command, out tile);
+            int command, tile; TurnMaker.EStatus status;
+            _turnMaker.Process(_state.stage == State.EStage.turn,Active, Enemy(Active), _state.tiles, _turn, ref turnFrame, keyboard, out command, out tile, out status);
+            
+            //тут комманд != -1 гарантирует, что ход сделан, и без статуса
             if (command != -1 && _state.stage == State.EStage.turn)
             {
                 _animator.SetAnimation(Active, Enemy(Active), _turn, (ECommand)command, tile);
@@ -152,10 +180,7 @@ namespace MagicStorm.Game
 
 
             #region draw part magic
-            int realTile = _state.activeWizard == 0 ? tile : Config.TileCount - 1 - tile;
-            frame.Add(new Sprite(ESprite.tileMarker, new Vector2(
-                Config.FirstTilePos.x + Config.DistBetweenTile * realTile, Config.IndLine, 0),
-                Config.MarkerSize));
+            
 
             _animator.DrawAll(ref frame);
             frame.Add(false, menuFrame, turnFrame, tilesFrame);

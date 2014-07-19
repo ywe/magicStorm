@@ -10,7 +10,9 @@ namespace MagicStorm.Game.DataClasses
         public static readonly ESprite[] SPRITES = new ESprite[] { ESprite.rectRed, ESprite.rectBlue, ESprite.rectGreen, ESprite.rectWhite };
         
         public int growingTime ; // если больше максимума, значит заморозка
-        public int color;
+        public int color; //0-3
+        public bool wallLeft = false;
+        public bool wallRight = false;
         public Tile(int color)
         {
             growingTime = 0;

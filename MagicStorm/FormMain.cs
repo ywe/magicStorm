@@ -31,7 +31,8 @@ namespace MagicStorm
 
             try
             {
-                File.Create(edtHistory.Text+"//log.txt");
+                FileStream fs =  File.Create(Path.Combine(edtHistory.Text,"log.txt"));
+                fs.Close();
             }
             catch
             {
@@ -48,18 +49,27 @@ namespace MagicStorm
                 return;
             }
 
+            if ((!cbPlayer1.Checked && !File.Exists(edtPlayer1.Text))
+                || (!cbPlayer2.Checked && !File.Exists(edtPlayer2.Text)))
+            {
+                MessageBox.Show("Не задан путь к программе");
+                return;
+            }
+
             //запуск в другом потоке
             ParamsFromFormToGame p = new ParamsFromFormToGame()
             {
-                 firstAddress = edtPlayer1.Text,
-                 secondAddress = edtPlayer2.Text,
-                 logfile = edtHistory + "//log.txt",
-                 map = map
+                 firstAddress = cbPlayer1.Checked? null: edtPlayer1.Text,
+                 secondAddress = cbPlayer2.Checked? null: edtPlayer2.Text,
+                 logfile = Path.Combine(edtHistory.Text, "log.txt"),
+                 map = map,
+                 animTime = trackBar1.Value * 0.1
             };
+            
             game = new Thread(
                 new ThreadStart(() => NewGame(p)));
             game.SetApartmentState(ApartmentState.STA);
-            game.Start(); 
+            game.Start();
         }
 
         

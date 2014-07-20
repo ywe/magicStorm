@@ -11,9 +11,12 @@ namespace MagicStorm.Game
 {
     class Game : IGame
     {
+        static int ID_NOT_USE=0;
+        static int NextID { get { return ID_NOT_USE++; } }
+
         AnimRecorder _animRecorder = new AnimRecorder();
         TurnMaker _turnMaker = new TurnMaker();
-        Animator _animator = new Animator();
+        Animator _animator;
         State _state = new State();
 
         int? arrowBlue = null, arrowRed = null;
@@ -48,6 +51,8 @@ namespace MagicStorm.Game
             
 
             _turnMaker.logfile = p.logfile;
+            _animator = new Animator(_state.wizards);
+            CreateLines(20);
         }
 
         public Frame Process(IGetKeyboardState keyboard)
@@ -58,8 +63,6 @@ namespace MagicStorm.Game
             
             _animRecorder.Process(keyboard, ref frame);
 
-            _state.tiles[4].growingTime = 2;
-            _state.tiles[5].growingTime = 15;
 
             Frame turnFrame = new Frame();
             #region turn control part
@@ -69,24 +72,33 @@ namespace MagicStorm.Game
             //тут комманд != -1 гарантирует, что ход сделан, и без статуса
             if (command != -1 && _state.stage == State.EStage.turn)
             {
-                _animator.SetAnimation(Active, Enemy(Active), _turn, (ECommand)command, tile);
-                _state.wizards[_state.activeWizard].lastCommand = command;
-                _state.wizards[_state.activeWizard].lastTile = tile;
-                _state.stage = State.EStage.animation;
+                if (status == TurnMaker.EStatus.ok)
+                    RunCommand((ECommand)command, tile);
+                else
+                {
+                    //todo сделать, что будет при ошибочной команде
+                }
+                _state.stage = State.EStage.animationAfter;
             }
-            if (_state.stage == State.EStage.animation)
+            if (_state.stage == State.EStage.animationAfter)
             {
-                bool finished = _animator.Process(_turn);
-                if (finished) _state.stage = State.EStage.runCommand;
+                bool finished = Animation(lineAfter[0]);
+                if (finished)
+                {
+                    _state.stage = State.EStage.animationBefore; //тут важно, чтоб гейм финиш еще мог переделать состояние
+                    CheckGameFinish();
+                    GoToNewLoop();
+                }
 
             }
-            if (_state.stage == State.EStage.runCommand)
+            if (_state.stage == State.EStage.animationBefore)
             {
-                RunCommand();
-                _state.activeWizard = (_state.activeWizard + 1) % 2;
-                if (_state.stage != State.EStage.finish)
+                bool finished = Animation(lineBefore[0]);
+                if (finished)
+                {
                     _state.stage = State.EStage.turn;
-                _turn++;
+                    CheckGameFinish();
+                }
             }
             #endregion
 
@@ -125,13 +137,6 @@ namespace MagicStorm.Game
                         Config.TileSize));
                 }
             }
-
-            foreach (Wizard w in _state.wizards)
-            {
-                tilesFrame.Add(new Sprite(w.team == Wizard.ETeam.first ? ESprite.wizardBlue : ESprite.wizardPink,
-                     new Vector2(Config.FirstTilePos.x + w.pos * Config.DistBetweenTile,
-                        Config.FloorLine - Config.WizardVert - Config.WizardSize.y / 2, 0), Config.WizardSize));
-            }
             #endregion
 
 
@@ -141,8 +146,6 @@ namespace MagicStorm.Game
                 new Vector2(Config.GameSize.x / 2, Config.MenuLine / 2, 0),
                 new Point2(Config.GameSize.x, Config.MenuLine)));
 
-            _state.wizards[0].hp = 45;
-            _state.wizards[0].flowersChange[3] = 13;
             foreach (Wizard w in _state.wizards)
             {
                 menuFrame.Add(new Text(EFont.lilac,
@@ -208,10 +211,129 @@ namespace MagicStorm.Game
         }
 
 
+        //1 - при переходе задаем все анимашки
+        //2 - во время секции анимации их выполняем
+        List<Queue<Box>> lineBefore;
+        List<Queue<Box>> lineAfter; //индекс - через сколько ходов
+        public void CreateLines(int count)
+        {
+            lineBefore = new List<Queue<Box>>(count);
+            lineAfter = new List<Queue<Box>>(count);
+            for(int i = 0; i < count; i++){
+                lineBefore.Add( new Queue<Box>());
+                lineAfter.Add(  new Queue<Box>());
+            }
+        }
+        int iddd;
+        public void GoToNewLoop()
+        {
+            _animator.WindShow(8, false);
+            _animator.WindShow(10, true);
+            _animator.MoveWizard(0, 2, -3);
+            _animator.MoveWizard(1, 10, 2, true);
 
-        void RunCommand()
+            if (_turn %2== 0) { iddd = NextID; _animator.WallIn(iddd, 13); }
+            if (_turn %2== 1) _animator.WallOutAfter(iddd,50);
+
+            lineBefore.RemoveAt(0);
+            lineBefore.Add(new Queue<Box>());
+            lineAfter.RemoveAt(0);
+            lineAfter.Add(new Queue<Box>());
+            _state.activeWizard = (_state.activeWizard + 1) % 2;
+            for (int i = 0; i < 4; i++) Active.flowersChange[i] = 0;
+            _turn++;
+        }
+
+        bool Animation(Queue<Box> line) //возвращает - завершилась или нет
+        {
+            if (!_animator.Process()) return false;
+            if (line.Count == 0) return true;
+
+            bool first = true;
+            while(line.Count > 0 && (first || line.Peek().sameTime ))
+            {
+                first = false;
+
+                Box box = line.Dequeue();
+                switch (box.type)
+                {
+                    case Box.EType.digit:
+                        _animator.DigitShow(box.first, box.second);
+                        break;
+                    case Box.EType.fireIn:
+                        _animator.FireIn(box.id, box.first);
+                        break;
+                    case Box.EType.fireOut:
+                        _animator.FireOut(box.id);
+                        break;
+                    case Box.EType.attackFire:
+                        AttackFire(box.first);
+                        break;
+
+
+                    case Box.EType.changeHp:
+                        ChangeHP(box.first, box.second); //тут только отбор хп не ниже, чем до 0. Проверка конца игры в другом месте 
+                        break;
+                }
+            }
+
+            return false;
+        }
+
+
+        void RunCommand(ECommand command, int parameter)
+        {
+            if (command == ECommand.fire)
+            {
+                lineAfter[0].Enqueue(new Box(Box.EType.digit ){ first=parameter, second = 1});//сама цифра
+                int ID = NextID;
+                lineBefore[2].Enqueue(new Box(Box.EType.fireIn) { id = ID, first = parameter });
+                lineBefore[2].Enqueue(new Box(Box.EType.attackFire) { first = parameter });
+                lineBefore[4].Enqueue(new Box(Box.EType.attackFire) { first = parameter });
+                lineBefore[6].Enqueue(new Box(Box.EType.attackFire) { first = parameter });
+                lineBefore[6].Enqueue(new Box(Box.EType.fireOut) { id = ID });
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                Active.flowers[i] -= Config.Cost[command][i];
+                Active.flowersChange[i] = -Config.Cost[command][i];
+            }
+        }
+
+        //-------------small-------------------------------------------------
+        void AttackFire(int pos)
+        {
+            bool first = true;
+            for (int i = Math.Max(0, pos - 1); i <= Math.Min(Config.TileCount - 1, pos + 1); i++)
+            {
+                int wiz = WizardInTile(i);
+                if (wiz != -1)
+                {
+                    first = false;
+                    _animator.ShowDamage(wiz);
+                    lineBefore[0].Enqueue(new Box(Box.EType.changeHp){ sameTime = !first, first = wiz,second= -(int)Config.Damage[ECommand.fire]});
+                }
+            }
+        }
+        int WizardInTile(int tile)
+        {
+            foreach (var a in _state.wizards) if (a.pos == tile) return (int)a.team;
+            return -1;
+        }
+
+        void ChangeHP(int wizard, int hp)
+        {
+            Wizard w = _state.wizards[wizard];
+            if(w.hp + hp<0) hp = -w.hp;
+            w.hpChange = hp;
+            w.hp += hp;
+        }
+
+        void CheckGameFinish()
         {
 
         }
+        //----------------------------------------------------------------
     }
 }

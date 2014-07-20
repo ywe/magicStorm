@@ -7,7 +7,7 @@ namespace MagicStorm.Game.DataClasses
 {
     class State
     {
-        public enum EStage { turn, animation, runCommand, finish }
+        public enum EStage { animationBefore, turn, animationAfter, finish }
         public EStage stage = EStage.turn;
         public Tile[] tiles ;
         public bool[] walls;

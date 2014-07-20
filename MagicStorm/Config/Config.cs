@@ -14,8 +14,9 @@ namespace MagicStorm
         boulder, energyBall, explosion, eyes,
         fire, fist, lightning, plus, 
         rectBoardBright, rectBoardDark, 
-        rectBlue, rectRed, rectGreen, rectWhite,
-        rectWall, snowflake, windArrow, wings,
+        rectBlue, rectRed, rectGreen, rectWhite, rectBlack,
+        wall, snowflake, windArrow, wings,
+        orange2,
         end }
     public enum EFont { orange, fiol, green, lilac, end }
     
@@ -69,11 +70,32 @@ namespace MagicStorm
             {ECommand.wind , new int[]{0,0,0,18}},
         };
 
+        public static Dictionary<ECommand, int?> Damage = new Dictionary<ECommand, int?>
+        {
+            //red blue green white
+            {ECommand.move , 0},
+            {ECommand.fly , 0},
+            {ECommand.wall , 0},
+            {ECommand.heal , 6},
+            {ECommand.spy , 0},
+            {ECommand.changeColor , 0},
+            {ECommand.frigidity , 0},
+
+            {ECommand.fist , null}, //null - особый расчет
+            {ECommand.energyBall , 3},
+            {ECommand.explosion , 4},
+            {ECommand.boulder , null},
+            {ECommand.poison , 2},
+            {ECommand.fire , 10},
+            {ECommand.lightning , 25},
+            {ECommand.wind , 0},
+        };
+
         #region nested sprite config class
         public class SpriteConfig
         {
             public readonly string file;
-            public readonly int horFrames, vertFrames;
+            public  int horFrames, vertFrames;
             /// <summary>
             /// имя относительно екзешника, количество кадров по горизонтали и вертикали в файле
             /// </summary>
@@ -105,8 +127,8 @@ namespace MagicStorm
         public static int TileCount = 20;
         public static int FlowerGrowingTime = 5;
         public static int StartHP = 100;
-        public static int StartRes= 10;
-        public static int StartPos = 9;
+        public static int StartRes= 100;
+       // public static int StartPos = 9;
         public static double TileWidthToTileGapCoeff = 3.5;
         public static double TileHeightToTileWidthCoeff = 1.0;
 
@@ -118,7 +140,7 @@ namespace MagicStorm
             );
         public static Point2 FirstTilePos = new Point2( TileFieldRect.x + TileSize.x*(0.5 + 1.0/TileWidthToTileGapCoeff), 30);
         public static double DistBetweenTile = TileSize.x * (1 + 1.0 / TileWidthToTileGapCoeff);
-        public static double TileGap = 1.0/TileWidthToTileGapCoeff;
+        public static double TileGap = 1.0/TileWidthToTileGapCoeff*TileSize.x;
         //-----------------------------------------
 
         public static Point2 WizardSize = new Point2(TileSize.x, TileSize.x * 2);
@@ -146,15 +168,15 @@ namespace MagicStorm
         public static Point2 EyeSize = new Point2(TileSize.x, TileSize.x / 2);
         public static Point2 WingsSize = new Point2(TileSize.x, TileSize.y / 2);
         public static double WingsVert = - WizardSize.y / 128 * 44;
-        public static Point2 FireSie = new Point2(TileSize.x * 3 + TileGap*2, TileSize.x);
+        public static Point2 FireSize = new Point2(TileSize.x * 3 + TileGap*2, TileSize.x);
         public static Point2 LightningSize = new Point2(TileSize.x * 1.8, TileSize.x * 1.8);
-        public static double LightningHor = LightningSize.x / 8;
-        public static Point2 WallSize = new Point2(TileGap, TileGap * 8);
+        public static double LightningHor = -LightningSize.x / 8;
+        public static Point2 WallSize = new Point2(TileGap/2, TileSize.y * 3);
         public static double WallVert = 0;
         public static Point2 BoulderSize = new Point2(WizardSize.y, WizardSize.y);
         public static Point2 EnergyBallSize = new Point2(TileSize.x / 3, TileSize.x / 3);
         public static Point2 ExplosionSize = new Point2(TileSize.x, TileSize.x);
-        public static Point2 WindArrowSize = new Point2(TileSize.x, TileSize.x);
+        public static Point2 WindArrowSize = new Point2(TileSize.x, TileSize.x/3);
         public static Point2 PlusSize = new Point2(TileSize.x, TileSize.x);
         public static Point2 SwitcherSize = new Point2(2, 0.6);
         public static Point2 MarkerSize = new Point2(1, 1);
@@ -166,7 +188,8 @@ namespace MagicStorm
         static Config()
         {
             LoadSpritesAuto();
-
+            Sprites[ESprite.orange2.ToString()].horFrames = 16;
+            Sprites[ESprite.orange2.ToString()].vertFrames = 10;
             Keys.Add(EKeyboardAction.Fire, 32);
             Keys.Add(EKeyboardAction.Esc, 27);
             Keys.Add(EKeyboardAction.Enter, 13);

@@ -203,6 +203,7 @@ namespace MagicStorm.Game
                 if (!IsCommandAvailable(command, tile, wizard, enemy, tiles))
                 {
                     currentCommand[our] +=100; //:D потом не забыть вернуть
+                    status = EStatus.unrealCommand;
                 }
             }
             //---------
@@ -242,6 +243,9 @@ namespace MagicStorm.Game
                         Config.LetterSize, param.ToString()));
                 }
             }
+
+            if(our==1)
+                tile = Config.TileCount - 1 - tile;//преобразовали обратно
 
             
         }
@@ -328,7 +332,8 @@ namespace MagicStorm.Game
             if (com == ECommand.wall && (
                 (w.team == Wizard.ETeam.first && tiles[param].wallLeft) ||
                 (w.team == Wizard.ETeam.second && tiles[param].wallRight))) return false;
-            if (com == ECommand.frigidity && tiles[param].growingTime > Config.FlowerGrowingTime) return false;
+            //тут я подумал и решил, что кто-то захочет перезаморозить клетку, и закомментил
+           // if (com == ECommand.frigidity && tiles[param].growingTime > Config.FlowerGrowingTime) return false;
             if (com == ECommand.explosion && (w.pos == param || enemy.pos == param)) return false;
 
             return true;

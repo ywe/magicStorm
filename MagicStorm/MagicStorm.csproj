@@ -92,6 +92,7 @@
     <Compile Include="Game\Abstract\IProcess.cs" />
     <Compile Include="Game\Animator.cs" />
     <Compile Include="Game\Concrete\AnimRecorder.cs" />
+    <Compile Include="Game\DataClasses\Box.cs" />
     <Compile Include="Game\DataClasses\Moving.cs" />
     <Compile Include="Game\DataClasses\ParamsFromFormToGame.cs" />
     <Compile Include="Game\DataClasses\State.cs" />

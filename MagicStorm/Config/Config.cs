@@ -166,8 +166,8 @@ namespace MagicStorm
         public static double WizardVert = WizardSize.y / 10;
         public static Point2 ArrowSize = new Point2(TileSize.x, TileSize.x);
         public static Point2 EyeSize = new Point2(TileSize.x, TileSize.x / 2);
-        public static Point2 WingsSize = new Point2(TileSize.x, TileSize.y / 2);
-        public static double WingsVert = - WizardSize.y / 128 * 44;
+        public static Point2 WingsSize = new Point2(TileSize.x*2, TileSize.y );
+        public static double WingsVert = -WizardSize.y / 128 * 5;
         public static Point2 FireSize = new Point2(TileSize.x * 3 + TileGap*2, TileSize.x);
         public static Point2 LightningSize = new Point2(TileSize.x * 1.8, TileSize.x * 1.8);
         public static double LightningHor = -LightningSize.x / 8;

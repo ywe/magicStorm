@@ -15,6 +15,7 @@ namespace MagicStorm.Game
         List<Moving> move = new List<Moving>();
         Dictionary<int, Moving> alive = new Dictionary<int, Moving>(); //те, которые сразу не умирают
         Moving[] wizards = new Moving[2];
+        List<Moving> wingsMove= new List<Moving>(); //для порядка отрисовки
 
         public Animator(Wizard[] wizards)
         {
@@ -33,11 +34,13 @@ namespace MagicStorm.Game
         {
             bool r = true; 
             foreach (var a in move) r = r & a.Update();
-            for (int i = 0; i < move.Count; i++) if (move[i].FinalPointReached) move.RemoveAt(i--);
-
+            foreach (var a in wingsMove) r = r & a.Update();
             foreach (Moving m in alive.Values) r = r & m.Update();
-
             foreach (Moving m in wizards) r = r & m.Update();
+
+            for (int i = 0; i < move.Count; i++) if (move[i].FinalPointReached) move.RemoveAt(i--);
+            for (int i = 0; i < wingsMove.Count; i++) if (wingsMove[i].FinalPointReached) wingsMove.RemoveAt(i--);
+
 
             return r;
         }
@@ -60,9 +63,10 @@ namespace MagicStorm.Game
 
         public void DrawAll(ref Frame frame)
         {
-            foreach (var a in wizards) a.Draw(ref frame);
             foreach (var a in move) a.Draw(ref frame);
             foreach (Moving m in alive.Values) m.Draw(ref frame);
+            foreach (var a in wingsMove) a.Draw(ref frame);
+            foreach (var a in wizards) a.Draw(ref frame);
             
         }
 
@@ -135,23 +139,59 @@ namespace MagicStorm.Game
             }
         }
 
-        public void MoveWizard(int num, int pos, int d, bool lastStepFailed=false)
+        //может столкнуться со стеной или другим магом
+        public void MoveWizard(int num, int pos, int d, int destroyWall=-1, bool wizardCollision=false, bool fly = false)
         {
+            bool lastStepFailed = wizardCollision || destroyWall != -1;
+
             Moving m = wizards[num];
+            int moveTime = t(30) * (int)Math.Abs(d);
+            int failTime = t(26);
+            int wingsTime = fly? t(8):0;
+            if (fly) { moveTime = t(15) * (int)Math.Abs(d); failTime = t(14); }
+
             m.cur = new Vector2(PosX(pos), Config.FloorLine - Config.WizardVert - Config.WizardSize.y/2, 0);//на всякий случай
             m.ClearAllPoints();
-            m.AddMove(new Point2(PosX(pos + d), m.cur.y), t(30) * (int)Math.Abs(d), LinearSwing);
+
+            // ждем пока появятся крылья
+            
+            m.AddMove(new Point2(PosX(pos), m.cur.y), wingsTime, LinearSwing);
+
+            m.AddMove(new Point2(PosX(pos + d), m.cur.y), moveTime, LinearSwing);
             if (lastStepFailed)
             {
                 double bound;
                 if (d < 0) bound = (PosX(pos + d - 1) + PosX(pos + d)) / 2 + Config.WizardSize.x / 2;
                 else bound = (PosX(pos + d + 1) + PosX(pos + d)) / 2 - Config.WizardSize.x / 2;
 
-                m.AddMove(new Point2(bound, m.cur.y), t(13), LinearSwing);
-                m.AddMove(new Point2(PosX(pos + d), m.cur.y), t(13), LinearSwing);
+                m.AddMove(new Point2(bound, m.cur.y), failTime/2, LinearSwing);
+                m.AddMove(new Point2(PosX(pos + d), m.cur.y), failTime/2, LinearSwing);
             }
 
+            if (destroyWall != -1)
+            {
+                WallOutAfter(destroyWall, moveTime + wingsTime + failTime / 2);
+            }
+
+            if (fly)
+            {
+                Moving wing = new Moving(ESprite.wings, new Point2(0,0), new Point2(PosX(pos ), m.cur.y)+new Point2(0,Config.WingsVert), true);
+                wing.AddMove(wing.cur.point , wingsTime, LinearSwing, Config.WingsSize);
+                wing.AddMove(new Point2(PosX(pos + d), wing.cur.y), moveTime, LinearSwing, Config.WingsSize);
+                if (lastStepFailed)
+                {
+                    double bound;
+                    if (d < 0) bound = (PosX(pos + d - 1) + PosX(pos + d)) / 2 + Config.WizardSize.x / 2;
+                    else bound = (PosX(pos + d + 1) + PosX(pos + d)) / 2 - Config.WizardSize.x / 2;
+
+                    wing.AddMove(new Point2(bound, wing.cur.y), failTime / 2, LinearSwing, Config.WingsSize);
+                    wing.AddMove(new Point2(PosX(pos + d), wing.cur.y), failTime / 2, LinearSwing, Config.WingsSize);
+                }
+                wing.AddMove(new Point2(PosX(pos+d), wing.cur.y), wingsTime, LinearSwing, new Point2(0, 0));
+                wingsMove.Add(wing);
+            }
         }
+
 
         public void WallIn(int id, int pos)
         {
@@ -175,7 +215,7 @@ namespace MagicStorm.Game
         {
             Moving m = alive[id];
             alive.Remove(id);
-            m.AddMove(m.cur.point, time, LinearSwing, m.curSize);
+            m.AddMove(m.cur.point, time, LinearSwing, Config.WallSize);
             m.AddMove(m.cur.point, t(30), LinearSwing, new Point2(0, Config.WallSize.y));
             move.Add(m);
         }

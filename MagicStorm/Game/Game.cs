@@ -230,10 +230,19 @@ namespace MagicStorm.Game
             _animator.WindShow(8, false);
             _animator.WindShow(10, true);
             _animator.MoveWizard(0, 2, 0,fly:true,wizardCollision:true);
-           // if (_turn % 2 == 0) { iddd = NextID; _animator.WallIn(iddd, 13); }
+            if (_turn  == 0) { iddd = NextID; _animator.WallIn(iddd, 13); }
            // if (_turn % 2 == 1) _animator.WallOutAfter(iddd, 50);
            // _animator.MoveWizard(1, 10, 2, iddd);
+            if (_turn == 1)
+                _animator.ShowExplosion(13, firstWallId: iddd);
+            if(_turn < 3)
+                _animator.ShowPoison(1, 10);
+           // if(_turn == 3)
+            //_animator.ShowHeal(10,1);
 
+            //_animator.ShowFist(10);
+           // _animator.ShowChangeColor(10, 4);
+            _animator.ShowSpy(10);
 
             lineBefore.RemoveAt(0);
             lineBefore.Add(new Queue<Box>());

@@ -335,6 +335,7 @@ namespace MagicStorm.Game
             //тут я подумал и решил, что кто-то захочет перезаморозить клетку, и закомментил
            // if (com == ECommand.frigidity && tiles[param].growingTime > Config.FlowerGrowingTime) return false;
             if (com == ECommand.explosion && (w.pos == param || enemy.pos == param)) return false;
+            if (com == ECommand.poison && enemy.poisoned) return false; //по 2 раза не травим
 
             return true;
         }

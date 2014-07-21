@@ -41,25 +41,12 @@ namespace MagicStorm.Game
             for (int i = 0; i < move.Count; i++) if (move[i].FinalPointReached) move.RemoveAt(i--);
             for (int i = 0; i < wingsMove.Count; i++) if (wingsMove[i].FinalPointReached) wingsMove.RemoveAt(i--);
 
+            if (expWait != -1) r = false;
+            ProcessWizardSprite();
 
             return r;
         }
 
-        public void SetAnimation(Wizard w, Wizard enemy, int turn, ECommand command, int parameter = -1)
-        {
-            switch (command)
-            {
-                case ECommand.spy:
-                    Moving m = new Moving(ESprite.eyes, Config.EyeSize, AboveTile(enemy.pos) + UP);
-                    m.AddMove(AboveTile(enemy.pos), t(50), SinSwingRefined);
-                    m.AddMove(AboveTile(enemy.pos), t(10), SinSwingRefined);
-                    m.AddMove(AboveTile(enemy.pos) + UP, t(50), SinSwingRefined);
-                    move.Add(m);
-                    break;
-            }
-        }
-
-       
 
         public void DrawAll(ref Frame frame)
         {
@@ -67,10 +54,51 @@ namespace MagicStorm.Game
             foreach (Moving m in alive.Values) m.Draw(ref frame);
             foreach (var a in wingsMove) a.Draw(ref frame);
             foreach (var a in wizards) a.Draw(ref frame);
-            
+            ExplosionProcess(ref frame); 
         }
 
+        #region simple animations
+        public void ShowFist(int pos)
+        {
+            ShowSimple(ESprite.fist, Config.FistSize, pos);
+        }
 
+        public void ShowSpy(int pos)
+        {
+            ShowSimple(ESprite.eyes, Config.EyeSize, pos);
+        }
+
+        public void ShowHeal(int pos, int? wizardHealFormPoison)
+        {
+            ShowSimple(ESprite.plus, Config.PlusSize, pos);
+            if (wizardHealFormPoison != null)
+            {
+                changeWizardSprTime[(int)wizardHealFormPoison] = t(55);
+            }
+        }
+
+        public void ShowChangeColor(int pos, int color)
+        {
+            ESprite spr;
+            if (color == 1) spr = ESprite.arrowRed;
+            else if (color == 2) spr = ESprite.arrowBlue;
+            else if (color == 3) spr = ESprite.arrowGreen;
+            else spr = ESprite.arrowWhite;
+            ShowSimple(spr, Config.ArrowSize, pos);
+        }
+
+        void ShowSimple(ESprite sprite, Point2 size, int pos)
+        {
+            Moving m = new Moving(sprite, size, AboveTile(pos) + UP);
+            m.AddMove(AboveTile(pos), t(50), SinSwingRefined);
+            m.AddMove(AboveTile(pos), t(10), SinSwingRefined);
+            m.AddMove(AboveTile(pos) + UP, t(50), SinSwingRefined);
+            move.Add(m);
+        }
+
+        #endregion
+
+        #region fire, lightning, wind
         public void FireIn(int id, int pos)
         {
             Moving m = new Moving(ESprite.fire, new Point2(Config.FireSize.x, 0), Ground(pos, 0), true, false);
@@ -138,7 +166,9 @@ namespace MagicStorm.Game
                 height -= dist;
             }
         }
+        #endregion
 
+        #region move, fly, wall
         //может столкнуться со стеной или другим магом
         public void MoveWizard(int num, int pos, int d, int destroyWall=-1, bool wizardCollision=false, bool fly = false)
         {
@@ -203,14 +233,6 @@ namespace MagicStorm.Game
             alive.Add(id, m);
         }
 
-        public void WallOut(int id)
-        {
-            Moving m = alive[id];
-            alive.Remove(id);
-            m.AddMove(m.cur.point, t(30), LinearSwing, new Point2(0, Config.WallSize.y));
-            move.Add(m);
-        }
-
         public void WallOutAfter(int id, int time)
         {
             Moving m = alive[id];
@@ -219,6 +241,79 @@ namespace MagicStorm.Game
             m.AddMove(m.cur.point, t(30), LinearSwing, new Point2(0, Config.WallSize.y));
             move.Add(m);
         }
+        #endregion
+
+        #region explosion, poison(with sprite change)
+        double expWait=-1;
+        double expStage = 0;
+        Point2 expLoc;
+        public void ShowExplosion(int pos, int? firstWallId=null, int? secondWallId = null)
+        {
+            Point2 loc = expLoc = new Point2(PosX(pos), Config.FloorLine - Config.WizardSize.y / 2);
+            Point2 start = new Point2(PosX(pos), Config.IndLine + UP.y);
+            Moving m = new Moving(ESprite.pointRed, Config.PointSize, start);
+            m.AddMove(loc, t(40), SinSwingRefined);
+            move.Add(m);
+
+            expWait =  t(40);
+
+            if (firstWallId != null)
+            {
+                WallOutAfter((int)firstWallId, t(80));
+            }
+        }
+
+        void ExplosionProcess(ref Frame frame)
+        {
+            if (expWait > 0) { expWait--; }
+            else if (expWait == 0)
+            {
+                if (expStage <1)
+                {
+                    frame.Add(new Sprite(ESprite.explosion, new Vector2(expLoc),
+                        Config.ExplosionSize, (int)(expStage * 81)));
+                    expStage += 1.0 / t(81);
+                    if (expStage > 0.9999999) { expWait = -1; expStage = 0; }
+                }
+            }
+        }
+
+        int[] changeWizardSprTime = new int[] { -1, -1 };
+        public void ShowPoison(int numWizard, int pos)
+        {
+            Point2 loc =  new Point2(PosX(pos), Config.FloorLine - Config.WizardSize.y / 2);
+            Point2 start = new Point2(PosX(pos), Config.IndLine + UP.y);
+            Moving m = new Moving(ESprite.tileMarker, Config.PointSize, start);
+            m.AddMove(loc, t(40), SinSwingRefined);
+            move.Add(m);
+            changeWizardSprTime[numWizard] = Math.Max(1,t(30));
+        }
+
+
+        public void ProcessWizardSprite()
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                if (changeWizardSprTime[i] > 0) changeWizardSprTime[i]--;
+                if(changeWizardSprTime[i]==0)
+                {
+                    if (i == 0)
+                        wizards[i].sprite = wizards[i].sprite == ESprite.wizardBlue ? ESprite.wizardSick : ESprite.wizardBlue;
+                    else
+                        wizards[i].sprite = wizards[i].sprite == ESprite.wizardPink ? ESprite.wizardSick : ESprite.wizardPink;
+                    changeWizardSprTime[i] = -1;
+                }
+                
+            }
+        }
+        #endregion
+
+        #region frigidity, energyBall, boulder
+        void ShowFrigidity(int pos)
+        {
+
+        }
+        #endregion
 
         public void DigitShow(int pos, int digit)
         {
